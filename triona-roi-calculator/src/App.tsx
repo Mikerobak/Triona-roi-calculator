@@ -58,14 +58,18 @@ function calculateResults(inputs: Inputs): Results {
   // 1. GPO Savings (eliminate small fleet premiums)
   const insuranceCostPerMile = 0.099;
   const maintenanceCostPerMile = 0.202;
-  const fuelCostPerMile = 0.55;
   const equipmentCostPerMile = 0.36;
   const insurancePremium = 0.22;
   const fuelPremium = 0.04;
   const maintenancePremium = 0.17;
   const equipmentPremium = 0.12;
+
+  // ADD: Calculate fuelCostPerMile using inputs
+  // Ensure mpg is not zero to avoid division by zero
+  const fuelCostPerMile = mpg > 0 ? fuelPrice / mpg : 0;
+
   const gpoInsuranceSavings = (insuranceCostPerMile * insurancePremium) * annualMiles * numTrucks;
-  const gpoFuelSavings = (fuelCostPerMile * fuelPremium) * annualMiles * numTrucks;
+  const gpoFuelSavings = (fuelCostPerMile * fuelPremium) * annualMiles * numTrucks; // Now uses the calculated value
   const gpoMaintenanceSavings = (maintenanceCostPerMile * maintenancePremium) * annualMiles * numTrucks;
   const gpoEquipmentSavings = (equipmentCostPerMile * equipmentPremium) * annualMiles * numTrucks;
   const gpoSavings = gpoInsuranceSavings + gpoFuelSavings + gpoMaintenanceSavings + gpoEquipmentSavings;
