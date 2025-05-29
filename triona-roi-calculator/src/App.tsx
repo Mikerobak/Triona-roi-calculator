@@ -119,10 +119,20 @@ function calculateResults(inputs: Inputs): Results {
   const projectedValuation2032 = 5000000000;
   const equityValue = projectedValuation2032 * totalEquityPercent / 7; // annualized
 
-  // Cost comparison
-  const atriCostPerMile = 2.27;
-  const currentOperatingCostPerTruck = atriCostPerMile * annualMiles / numTrucks;
-  const utmOperatingCostPerTruck = currentOperatingCostPerTruck - (netSavings / numTrucks);
+  // Cost comparison - Using total miles (revenue + deadhead) for accurate baseline
+  const atriCostPerMile = 2.27; // ATRI 2023 marginal cost
+
+  // Calculate total miles per truck including assumed baseline deadhead
+  const annualMilesRevenuePerTruck = monthlyMiles * 12; // Annual REVENUE miles per truck
+  const assumedBaselineDeadheadPercent = 0.163; // 16.3% from your text
+  const totalMilesPerTruck = annualMilesRevenuePerTruck / (1 - assumedBaselineDeadheadPercent);
+
+  // Calculate operating cost per truck WITHOUT Triona benefits (based on ATRI cost on total miles)
+  const operatingCostPerTruckAlone = atriCostPerMile * totalMilesPerTruck;
+
+  // Calculate operating cost per truck WITH Triona benefits
+  const netSavingsPerTruck = netSavings / numTrucks;
+  const utmOperatingCostPerTruck = operatingCostPerTruckAlone - netSavingsPerTruck;
 
   // Cost of Missing Out
   const growthOpportunity = totalFleetRevenue * 0.25;
@@ -142,7 +152,7 @@ function calculateResults(inputs: Inputs): Results {
     netSavings,
     roiPercentage,
     equityValue,
-    aloneOperatingCost: currentOperatingCostPerTruck,
+    aloneOperatingCost: operatingCostPerTruckAlone,
     utmOperatingCost: utmOperatingCostPerTruck,
     growthOpportunity,
     missedBrokerFees,
