@@ -28,6 +28,8 @@ type Results = {
   factoringSavings: number;
   efficiencySavings: number;
   loadOptimization: number;
+  deadheadSavings: number;
+  detentionSavings: number;
   totalSavings: number;
   trionaMembershipCost: number;
   netSavings: number;
@@ -80,8 +82,8 @@ function calculateResults(inputs: Inputs): Results {
   const factoringReduction = currentFactoredRevenue - newFactoredRevenue;
   const factoringSavings = factoringReduction * (factoringRate / 100);
 
-  // 3. Time Savings (15 hours/week × $65/hour)
-  const ownerHourlyValue = 65;
+  // 3. Time Savings (Using updated ownerHourlyValue)
+  const ownerHourlyValue = 100;
   const hoursReduction = backOfficeHours * 0.60;
   const weeklyTimeSavings = hoursReduction * ownerHourlyValue;
   const efficiencySavings = weeklyTimeSavings * 52;
@@ -90,8 +92,16 @@ function calculateResults(inputs: Inputs): Results {
   const loadOptimizationPerMile = 0.08;
   const loadOptimization = loadOptimizationPerMile * annualMiles * numTrucks;
 
-  // Total operational savings (no equity, no double counting)
-  const totalSavings = gpoSavings + factoringSavings + efficiencySavings + loadOptimization;
+  // 5. Deadhead Mile Reduction
+  const annualDeadheadSavingsPerTruck = 16775;
+  const deadheadSavings = annualDeadheadSavingsPerTruck * numTrucks;
+
+  // 6. Detention Cost Reduction/Recovery
+  const annualDetentionSavingsPerTruck = 3893;
+  const detentionSavings = annualDetentionSavingsPerTruck * numTrucks;
+
+  // Total operational savings (including new categories)
+  const totalSavings = gpoSavings + factoringSavings + efficiencySavings + loadOptimization + deadheadSavings + detentionSavings;
 
   // Membership cost
   const trionaMembershipCost = totalFleetRevenue * 0.02;
@@ -125,6 +135,8 @@ function calculateResults(inputs: Inputs): Results {
     factoringSavings,
     efficiencySavings,
     loadOptimization,
+    deadheadSavings,
+    detentionSavings,
     totalSavings,
     trionaMembershipCost,
     netSavings,
@@ -185,6 +197,18 @@ const resultCards = [
     label: 'Load Optimization',
     valueKey: 'loadOptimization',
     description: '$0.08/mile improvement through AI optimization',
+  },
+  {
+    icon: '📉',
+    label: 'Deadhead Reduction',
+    valueKey: 'deadheadSavings',
+    description: 'Reduce unproductive empty miles through optimized load matching',
+  },
+  {
+    icon: '⏳',
+    label: 'Detention Reduction & Recovery',
+    valueKey: 'detentionSavings',
+    description: 'Minimize time lost waiting and recover unpaid detention fees',
   },
 ];
 
@@ -262,6 +286,7 @@ const App: React.FC = () => {
                 <span className="benefit-value">{formatCurrency(results.growthOpportunity)}</span>
               </div>
               <div className="benefit-item">
+                <span className="benefit-name">Broker Fees (15%)</span>
                 <span className="benefit-name">Broker Fees (15%)</span>
                 <span className="benefit-value">{formatCurrency(results.missedBrokerFees)}</span>
               </div>
