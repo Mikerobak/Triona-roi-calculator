@@ -157,6 +157,33 @@ const inputProps: { [K in keyof Inputs]?: any } = {
   backOfficeHours: { min: 10, max: 60 },
 };
 
+const resultCards = [
+  {
+    icon: '🟠',
+    label: 'Group Purchasing Power (GPO)',
+    valueKey: 'gpoSavings',
+    description: 'Eliminate small fleet premiums: insurance, maintenance, fuel, equipment',
+  },
+  {
+    icon: '💸',
+    label: 'Factoring Reduction',
+    valueKey: 'factoringSavings',
+    description: 'Reduce factored revenue from 70% to 40%',
+  },
+  {
+    icon: '⏱️',
+    label: 'Time Savings',
+    valueKey: 'efficiencySavings',
+    description: 'Streamlined back-office and compliance management',
+  },
+  {
+    icon: '🚚',
+    label: 'Load Optimization',
+    valueKey: 'loadOptimization',
+    description: '$0.08/mile improvement through AI optimization',
+  },
+];
+
 const App: React.FC = () => {
   const [inputs, setInputs] = useState<Inputs>(defaultInputs);
   const [results, setResults] = useState<Results>(() => calculateResults(defaultInputs));
@@ -171,59 +198,85 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="container">
-      <h1>Triona UTM ROI Calculator</h1>
-      <div className="flex">
-        <div className="inputs">
-          {Object.entries(inputLabels).map(([key, label]) => (
-            <div key={key} style={{ marginBottom: 18 }}>
-              <label htmlFor={key}>{label}</label>
-              <input
-                id={key}
-                type="number"
-                value={inputs[key as keyof Inputs]}
-                onChange={handleInputChange}
-                {...inputProps[key as keyof Inputs]}
-              />
-            </div>
-          ))}
-        </div>
-        <div className="results">
-          <div className="result-block">Group Purchasing Power (GPO): <span>{formatCurrency(results.gpoSavings)}</span></div>
-          <div className="result-block">Factoring Reduction: <span>{formatCurrency(results.factoringSavings)}</span></div>
-          <div className="result-block">Time Savings: <span>{formatCurrency(results.efficiencySavings)}</span></div>
-          <div className="result-block">Load Optimization: <span>{formatCurrency(results.loadOptimization)}</span></div>
-          <div className="summary">
-            <div>Total Operational Savings: <span>{formatCurrency(results.totalSavings)}</span></div>
-            <div>Membership Cost: <span>{formatCurrency(results.trionaMembershipCost)}</span></div>
-            <div>Net Annual Savings: <span>{formatCurrency(results.netSavings)}</span></div>
-            <div>ROI: <span>{results.roiPercentage.toFixed(0)}%</span></div>
+    <>
+      <div className="header">
+        <h1>Triona UTM ROI Calculator</h1>
+        <p>Discover how much your small fleet can save by joining our Unified Transportation Management ecosystem</p>
+      </div>
+      <div className="container">
+        <div className="main-content">
+          <div className="inputs-section">
+            <h2 className="section-title">Fleet Profile</h2>
+            {Object.entries(inputLabels).map(([key, label]) => (
+              <div className="input-group" key={key}>
+                <label htmlFor={key}>{label}</label>
+                <input
+                  id={key}
+                  type="number"
+                  value={inputs[key as keyof Inputs]}
+                  onChange={handleInputChange}
+                  {...inputProps[key as keyof Inputs]}
+                />
+              </div>
+            ))}
           </div>
-          <div className="future-value">
-            <div>Future Equity Value (not included in savings): <span>{formatCurrency(results.equityValue)}</span></div>
-          </div>
-          <div className="cost-comparison">
-            <div className="cost-card small-fleet-cost">
-              <h4>Operating Alone</h4>
-              <div className="cost-value">{formatCurrency(results.aloneOperatingCost)}</div>
-              <div>per truck annually</div>
+          <div className="results-section">
+            <h2 className="section-title">Your Potential Annual Savings</h2>
+            <div className="results-grid">
+              {resultCards.map((card) => (
+                <div className="result-card" key={card.label}>
+                  <h3>{card.icon} {card.label}</h3>
+                  <div className="result-value">{formatCurrency(results[card.valueKey as keyof Results] as number)}</div>
+                  <div className="result-description">{card.description}</div>
+                </div>
+              ))}
             </div>
-            <div className="cost-card utm-fleet-cost">
-              <h4>With Triona UTM</h4>
-              <div className="cost-value">{formatCurrency(results.utmOperatingCost)}</div>
-              <div>per truck annually</div>
+            <div className="summary-card">
+              <h3>Net Annual UTM Value</h3>
+              <div className="summary-value">{formatCurrency(results.netSavings)}</div>
+              <div>ROI: <span>{results.roiPercentage.toFixed(0)}%</span> return on investment</div>
+              <div style={{marginTop: 10, fontSize: '0.9rem', opacity: 0.9}}>
+                Annual Membership Cost: <span>{formatCurrency(results.trionaMembershipCost)}</span>
+              </div>
             </div>
-          </div>
-          <div className="summary" style={{ background: '#f4f6fb', color: '#2a5298', marginTop: 24 }}>
-            <div style={{ fontWeight: 'bold' }}>Cost of Missing Out</div>
-            <div>Growth Opportunity (25% YOY): <span>{formatCurrency(results.growthOpportunity)}</span></div>
-            <div>Broker Fees (15%): <span>{formatCurrency(results.missedBrokerFees)}</span></div>
-            <div>Time Cost: <span>{formatCurrency(results.missedTimeCost)}</span></div>
-            <div>Small Fleet Penalty: <span>{formatCurrency(results.smallFleetPenalty)}</span></div>
+            <div className="cost-comparison">
+              <div className="cost-card small-fleet-cost">
+                <h4>Operating Alone</h4>
+                <div className="cost-value">{formatCurrency(results.aloneOperatingCost)}</div>
+                <div>per truck annually</div>
+              </div>
+              <div className="cost-card utm-fleet-cost">
+                <h4>With Triona UTM</h4>
+                <div className="cost-value">{formatCurrency(results.utmOperatingCost)}</div>
+                <div>per truck annually</div>
+              </div>
+            </div>
+            <div className="benefit-breakdown">
+              <h3 style={{marginBottom: 20, color: 'rgb(29,64,86)'}}>The Cost of Missing Out</h3>
+              <div className="benefit-item">
+                <span className="benefit-name">Growth Opportunity (25% YOY)</span>
+                <span className="benefit-value">{formatCurrency(results.growthOpportunity)}</span>
+              </div>
+              <div className="benefit-item">
+                <span className="benefit-name">Broker Fees (15%)</span>
+                <span className="benefit-value">{formatCurrency(results.missedBrokerFees)}</span>
+              </div>
+              <div className="benefit-item">
+                <span className="benefit-name">Time Cost</span>
+                <span className="benefit-value">{formatCurrency(results.missedTimeCost)}</span>
+              </div>
+              <div className="benefit-item">
+                <span className="benefit-name">Small Fleet Penalty</span>
+                <span className="benefit-value">{formatCurrency(results.smallFleetPenalty)}</span>
+              </div>
+            </div>
+            <div className="future-value" style={{marginTop: 24}}>
+              <div>Future Equity Value (not included in savings): <span>{formatCurrency(results.equityValue)}</span></div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
